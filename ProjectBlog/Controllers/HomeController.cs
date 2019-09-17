@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjectBlog.Models;
+using ProjectBlog.Service;
 
 namespace ProjectBlog.Controllers
 {
@@ -24,6 +25,12 @@ namespace ProjectBlog.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
+        public JsonResult GetBlogPostsLatest()
+        {
+            return Json(new BlogService().GetBlogPosts());
         }
     }
 }
