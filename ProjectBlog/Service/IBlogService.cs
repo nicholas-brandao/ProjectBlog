@@ -10,6 +10,9 @@ namespace ProjectBlog.Service
     {
 
         IEnumerable<BlogPost> GetBlogPosts();
+        IEnumerable<BlogPost> GetOlderPosts(int oldestBlogPostId);
+        string GetPostText(string link);
+
 
     }
 }

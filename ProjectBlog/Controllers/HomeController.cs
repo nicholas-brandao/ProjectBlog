@@ -11,6 +11,12 @@ namespace ProjectBlog.Controllers
 {
     public class HomeController : Controller
     {
+
+        private IBlogService _blogService;
+
+        public HomeController(IBlogService blogService) => _blogService = blogService;
+
+
         public IActionResult Index()
         {
             return View();
@@ -27,10 +33,21 @@ namespace ProjectBlog.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
         public JsonResult GetBlogPostsLatest()
         {
-            return Json(new BlogService().GetBlogPosts());
+            
+            return Json(_blogService.GetBlogPosts());
+        }
+
+        public JsonResult MoreBlogPosts(int oldestBlogPostId)
+        {
+            var posts = _blogService.GetOlderPosts(oldestBlogPostId);
+            return Json(posts);
+        }
+
+        public ContentResult Post(string link)
+        {
+            return Content(_blogService.GetPostText(link));
         }
     }
 }

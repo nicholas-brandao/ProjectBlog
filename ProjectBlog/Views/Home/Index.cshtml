@@ -1,4 +1,13 @@
-﻿<div class="blog-list card-columns" id="bloglist"></div>
+﻿<div class="text-center" id="blog-title">
+    <h1 class="display-4">Nicholas/Wallace Blog</h1>
+    <p>study and share, a learning philosophy</p>
+</div>
+
+<div class="blog-list card-columns" id="bloglist"></div>
+
+<div id="blog-item-container"></div>
+
+
 <script id="blog-card" type="text/template">
     <div class="card">
         <div class="card-body">
@@ -7,7 +16,25 @@
                 {{Title}}
             </h5>
             <p class="cardtext">{{ShortDescription}}</p>
-            <button class="btn btnprimary">ir</button>
+            <button class="btn btn-primary" onclick="pageEvents.getBlogPost('{{Link}}');">ir</button>
         </div>
     </div>
 </script>
+
+<div class="center">
+    <button class="btn btn-primary"
+            onclick="pageEvents.getMoreBlogPosts();">
+        ver mais
+    </button>
+    <br /><br />
+</div>
+
+
+<script id="blog-item" type="text/template">
+    <div id="{{Link}}" class="blog-item">
+        {{Content}}
+    </div>
+    <a href="#blog-title" class="btn btn-primary">voltar</a>
+</script>
+
+
