@@ -1,12 +1,49 @@
-﻿define(['./template.js', '../lib/showdown/showdown.js'], function (template, showdown) {
+﻿define(['./template.js', '../lib/showdown/showdown.js', './clientStorage.js'], function (template, showdown, clientStorage) {
     var blogPostLatest = '/Home/GetBlogPostsLatest';
     var blogPostUrl = '/Home/Post/?link=';
-    var blogMorePostsUrl ='/Home/MoreBlogPosts/?oldestBlogPostId=';
-    var oldestBlogPostId = 0;
+    var blogMorePostsUrl = '/Home/MoreBlogPosts/?oldestBlogPostId=';
 
-    function setOldestBlogPostId(data) {
-        var ids = data.map(item => item.id);
-        oldestBlogPostId = Math.min(...ids);
+    function fetchPromise(url, link, text) {
+
+        link = link || '';
+
+        return new Promise(function (resolve, reject) {
+            fetch(url + link)
+                .then(function (data) {
+
+                    var resolveSuccess = function () {
+                        resolve('The connection is OK, showing latest results');
+                    };
+
+                    if (text) {
+                        data.text().then(function (text) {
+                            clientStorage.addPostText(link, text).then(resolveSuccess);
+                        });
+                    }
+                    else {
+                        data.json().then(function (jsonData) {
+                            clientStorage.addPosts(jsonData).then(resolveSuccess);
+                        });
+                    }
+
+                }).catch(function (e) {
+                    resolve('No connection, showing offline results');
+                });
+
+            setTimeout(function () { resolve('The connection is hanging, showing offline results'); }, 5000);
+        });
+    }
+
+    function loadData(url) {
+        fetchPromise(url)
+            .then(function (status) {
+                $('#connection-status').html(status);
+
+                clientStorage.getPosts()
+                    .then(function (posts) {
+                        template.appendBlogList(posts);
+                    })
+            });
     }
 
     function getBlogPostsLatest() {
@@ -14,7 +51,7 @@
     }
 
     function getMoreBlogPosts() {
-        loadData(blogMorePostsUrl + oldestBlogPostId);
+        loadData(blogMorePostsUrl + clientStorage.getOldestBlogPostId());
     }
 
     function getBlogPost(link) {
@@ -27,17 +64,7 @@
                 template.showBlogItem(html, link);
                 window.location = '#' + link;
             });
-    }    function loadData(url) {
-        fetch(url)
-            .then(function (response) {
-                return response.json();
-            }).then(function (data) {
-                console.log(data);
-                template.appendBlogList(data);
-                setOldestBlogPostId(data);
-            });
-    }    
-
+    }
     return {
         getBlogPostsLatest: getBlogPostsLatest,
         getBlogPost: getBlogPost,
